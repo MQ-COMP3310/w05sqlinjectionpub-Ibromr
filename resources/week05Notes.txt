@@ -1,0 +1,21 @@
+
+Exercise 5.1.1. Develop the beginnings and principles of a policy on logging that should guide the
+implementation of a website and/or app that manages vaccination data for patients; data that can be
+added and modified by medical professionals.
+
+• what data should be logged locally?
+    passwords, personal data: like phone, IDs, addresses.
+
+• what data should be logged on the server side?
+    password, username, secret word...
+
+• what user actions should be logged?
+    entering the system, exiting the system, specific request like downloading, and uploading documents to system.
+
+• what data access actions should be logged?
+    entering, exiting 
+
+
+
+
+
