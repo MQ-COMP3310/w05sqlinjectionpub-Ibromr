@@ -19,3 +19,89 @@ added and modified by medical professionals.
 
 
 
+
+
+About exercise
+  
+1- no large exceptions what is game-related info or not? 
+2- does not pass the regex, info, warning, or error  (appropriate level is warning)  what is loginf level here meaning?
+3- severe level, 
+4- as information 
+5- warning level for exeptions, do not log exections, use generic
+6- ???
+
+two submussion
+App.java
+SQLi            
+
+
+
+
+
+
+
+public void addValidWord(int id, String word) {
+
+        String sql = "INSERT INTO validWords(id,word) VALUES(? ?)";
+                                                        //'" + id + "','" + word + "'
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(1,word);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+
+
+
+public boolean isValidWord(String guess) {
+        String sql = "SELECT count(id) as total FROM validWords WHERE word like ?;";
+
+        try (Connection conn = DriverManager.getConnection(databaseURL);
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, guess);
+            ResultSet resultRows = stmt.executeQuery();
+            if (resultRows.next()) {
+                int result = resultRows.getInt("total");
+                return (result >= 1);
+            }
+
+            return false;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+    }
+
+
+
+
+
+try (Scanner scanner = new Scanner(System.in)) {
+            System.out.print("Enter a 4 letter word for a guess or q to quit: ");
+            String guess = scanner.nextLine();
+
+            while (!guess.equals("q")) {
+
+                if (guess.matches("^[a-zA-Z]{4}$")) {
+
+                    System.out.println("You've guessed '" + guess+"'.");
+
+                    if (wordleDatabaseConnection.isValidWord(guess)) { 
+                        System.out.println("Success! It is in the the list.\n");
+                    }else{
+                        System.out.println("Sorry. This word is NOT in the the list.\n");
+                    } 
+                } else {
+                    System.out.println("Please " + guess + "");
+                }
+
+                
+            }
+        }

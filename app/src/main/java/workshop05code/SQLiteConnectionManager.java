@@ -125,14 +125,12 @@ public class SQLiteConnectionManager {
      * @param id   the unique id for the word
      * @param word the word to store
      */
-    public void addValidWord(int id, String word) {
+    public void addValidWord(int id, String word) {     // Need fix check notes
 
-        String sql = "INSERT INTO validWords(id,word) VALUES(? ?)";
-                                                        //'" + id + "','" + word + "'
+        String sql = "INSERT INTO validWords(id,word) VALUES('" + id + "','" + word + "')";
+
         try (Connection conn = DriverManager.getConnection(databaseURL);
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, id);
-                    pstmt.setString(1,word);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());

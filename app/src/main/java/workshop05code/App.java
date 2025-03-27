@@ -1,13 +1,12 @@
 package workshop05code;
 
 import java.io.BufferedReader;
+//Included for the logging exercise
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-//Included for the logging exercise
-import java.io.FileInputStream;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -74,16 +73,21 @@ public class App {
             String guess = scanner.nextLine();
 
             while (!guess.equals("q")) {
-                System.out.println("You've guessed '" + guess+"'.");
 
-                if (wordleDatabaseConnection.isValidWord(guess)) { 
-                    System.out.println("Success! It is in the the list.\n");
-                }else{
-                    System.out.println("Sorry. This word is NOT in the the list.\n");
+                if (guess.matches("^[a-zA-Z]{4}$")) {
+
+                    System.out.println("You've guessed '" + guess+"'.");
+
+                    if (wordleDatabaseConnection.isValidWord(guess)) { 
+                        System.out.println("Success! It is in the the list.\n");
+                    }else{
+                        System.out.println("Sorry. This word is NOT in the the list.\n");
+                    } 
+                } else {
+                    System.out.println("Please " + guess + "");
                 }
 
-                System.out.print("Enter a 4 letter word for a guess or q to quit: " );
-                guess = scanner.nextLine();
+                
             }
         } catch (NoSuchElementException | IllegalStateException e) {
             e.printStackTrace();
