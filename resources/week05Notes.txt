@@ -23,7 +23,7 @@ added and modified by medical professionals.
 
 About exercise
   
-1- no large exceptions what is game-related info or not? 
+1- no large exceptions --- what is game-related info or not? 
 2- does not pass the regex, info, warning, or error  (appropriate level is warning)  what is loginf level here meaning?
 3- severe level, 
 4- as information 
@@ -52,6 +52,9 @@ public void addValidWord(int id, String word) {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+iHateRegex
+Now you have two problems.
+
 
     }
 
