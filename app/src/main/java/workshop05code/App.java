@@ -5,8 +5,10 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -16,6 +18,8 @@ import java.util.logging.Logger;
  */
 public class App {
     // Start code for logging exercise
+
+
     static {
         // must set before the Logger
         // loads logging.properties from the classpath
@@ -32,68 +36,74 @@ public class App {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         SQLiteConnectionManager wordleDatabaseConnection = new SQLiteConnectionManager("words.db");
 
         wordleDatabaseConnection.createNewDatabase("words.db");
         if (wordleDatabaseConnection.checkIfConnectionDefined()) {
-            System.out.println("Wordle created and connected.");
+            logger.log(Level.INFO,"Wordle created and connected.");
         } else {
-            System.out.println("Not able to connect. Sorry!");
+            logger.log(Level.INFO,"Not able to connect. Sorry!");
             return;
         }
         if (wordleDatabaseConnection.createWordleTables()) {
-            System.out.println("Wordle structures in place.");
+            logger.log(Level.INFO,"Wordle structures in place.");
         } else {
-            System.out.println("Not able to launch. Sorry!");
+            logger.log(Level.INFO,"Not able to launch. Sorry!");
             return;
         }
 
-        // let's add some words to valid 4 letter words from the data.txt file
-
+        // log some words to valid 4 letter words from the data.txt file
         try (BufferedReader br = new BufferedReader(new FileReader("resources/data.txt"))) {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                logger.log(Level.INFO,line);
                 wordleDatabaseConnection.addValidWord(i, line);
                 i++;
             }
 
         } catch (IOException e) {
-            System.out.println("Not able to load . Sorry!");
-            System.out.println(e.getMessage());
+            logger.log(Level.WARNING,"Not able to load . Sorry!", e);
+           
+            // A log level guard to ensure it only executes 
+            // if the appropriate log level is enabled.
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e.getMessage());
+            }
+           
             return;
         }
 
         // let's get them to enter a word
-
+            
         try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Enter a 4 letter word for a guess or q to quit: ");
             String guess = scanner.nextLine();
 
-            //if (guess.matches("^[a-zA-Z]{4}$")) {
-
-            while (!guess.equals("q")) {
+            while (!"q".equals(guess)) {
                  // Validate the input to be exactly 4 lowercase letters
-                if (guess.matches("^[a-z]{4}$")) {
-                    System.out.println("You've guessed '" + guess + "'.");
-
-                    if (wordleDatabaseConnection.isValidWord(guess)) {
-                        System.out.println("Success! It is in the list.\n");
-                    } else {
-                        System.out.println("Sorry. This word is NOT in the list.\n");
-                    }
+                if (!guess.matches("^[a-z]{4}$") && logger.isLoggable(Level.WARNING)) {
+                    // A log level guard to ensure it only executes 
+                    // if the appropriate log level is enabled.
+                    logger.log(Level.WARNING, "{0} is Invalid guess!\n", guess);
+                } else if (wordleDatabaseConnection.isValidWord(guess)) {
+                    logger.log(Level.INFO, "Successful login\n");
+                    System.out.println("Success! It is in the list.\n");  // System.out is not too secure  I know but I could not find easier way
+                    
                 } else {
-                    System.out.println("Invalid input!\n");
+                    // A log level guard to ensure it only executes 
+                    // if the appropriate log level is enabled.
+                    if (logger.isLoggable(Level.SEVERE)) {
+                        logger.log(Level.SEVERE,"{0} is invalid word. This word is NOT in the list.\n", guess);
+                    }    
                 }
 
-                System.out.print("Enter a 4 letter word for a guess or q to quit: " );
+
                 guess = scanner.nextLine();
             }
         } catch (NoSuchElementException | IllegalStateException e) {
-            e.printStackTrace();
-        }
+            logger.log(Level.WARNING, "Message", e);
+        } 
 
     }
 }

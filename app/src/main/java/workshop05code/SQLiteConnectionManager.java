@@ -34,16 +34,31 @@ public class SQLiteConnectionManager {
     private String databaseURL = "";
 
     private static final String WORDLE_DROP_TABLE_STRING = "DROP TABLE IF EXISTS wordlist;";
-    private static final String WORDLE_CREATE_STRING = "CREATE TABLE wordlist (\n"
-            + " id integer PRIMARY KEY,\n"
-            + " word text NOT NULL\n"
-            + ");";
+    
+    /*
+     * String concatenation (`+`) creates multiple intermediate `String` objects, which can be inefficient. 
+     * Text blocks are optimized at compile time.
+     */
+    private static final String WORDLE_CREATE_STRING = """
+            CREATE TABLE wordlist (
+                id integer PRIMARY KEY,
+                word text NOT NULL
+            );
+            """;
+    
 
     private static final String VALID_WORDS_DROP_TABLE_STRING = "DROP TABLE IF EXISTS validWords;";
-    private static final String VALID_WORDS_CREATE_STRING = "CREATE TABLE validWords (\n"
-            + " id integer PRIMARY KEY,\n"
-            + " word text NOT NULL\n"
-            + ");";
+
+    /*
+     * String concatenation (`+`) creates multiple intermediate `String` objects, which can be inefficient. 
+     * Text blocks are optimized at compile time.
+     */
+    private static final String VALID_WORDS_CREATE_STRING = """
+            CREATE TABLE validWords (
+                id integer PRIMARY KEY,
+                word text NOT NULL
+            );
+            """;
     /**
      * Set the database file name in the sqlite project to use
      *
@@ -64,12 +79,22 @@ public class SQLiteConnectionManager {
         try (Connection conn = DriverManager.getConnection(databaseURL)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
+
+                // A log level guard to ensure it only executes 
+                // if the appropriate log level is enabled.
+               if (logger.isLoggable(Level.INFO)) {
+                   logger.log(Level.INFO, "The driver name is {0}", meta.getDriverName());
+               }
+                logger.log(Level.INFO,"A new database has been created.");
 
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+
+            // A log level guard to ensure it only executes 
+            // if the appropriate log level is enabled.
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e.getMessage());
+            }
         }
     }
 
@@ -80,7 +105,7 @@ public class SQLiteConnectionManager {
      *         no url defined, also false.
      */
     public boolean checkIfConnectionDefined() {
-        if (databaseURL.equals("")) {
+        if ("".equals(databaseURL)) {  // Positioning literals first in String comparisons
             return false;
         } else {
             try (Connection conn = DriverManager.getConnection(databaseURL)) {
@@ -88,7 +113,11 @@ public class SQLiteConnectionManager {
                     return true;
                 }
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                // A log level guard to ensure it only executes 
+                // if the appropriate log level is enabled.
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.log(Level.WARNING, e.getMessage());
+                }
                 return false;
             }
         }
@@ -101,7 +130,7 @@ public class SQLiteConnectionManager {
      * @return true if the table structures have been created.
      */
     public boolean createWordleTables() {
-        if (databaseURL.equals("")) {
+        if ("".equals(databaseURL)) { // Positioning literals first in String comparisons
             return false;
         } else {
             try (Connection conn = DriverManager.getConnection(databaseURL);
@@ -113,7 +142,11 @@ public class SQLiteConnectionManager {
                 return true;
 
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                // A log level guard to ensure it only executes 
+                // if the appropriate log level is enabled.
+                if (logger.isLoggable(Level.WARNING)) {
+                    logger.log(Level.WARNING, e.getMessage());
+                }
                 return false;
             }
         }
@@ -138,7 +171,11 @@ public class SQLiteConnectionManager {
                 pstmt.executeUpdate();
                 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            // A log level guard to ensure it only executes 
+            // if the appropriate log level is enabled.
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e.getMessage());
+            }
         }
 
     }
@@ -155,16 +192,21 @@ public class SQLiteConnectionManager {
         try (Connection conn = DriverManager.getConnection(databaseURL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, guess);
-            ResultSet resultRows = stmt.executeQuery();
-            if (resultRows.next()) {
-                int result = resultRows.getInt("total");
-                return (result >= 1);
+            try (ResultSet resultRows = stmt.executeQuery()) { // Object is closed after use by wrapping it in a try-with-resources block.
+                if (resultRows.next()) {
+                    int result = resultRows.getInt("total");
+                    return result >= 1;
+                }
             }
 
             return false;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            // A log level guard to ensure it only executes 
+            // if the appropriate log level is enabled.
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e.getMessage());
+            }
             return false;
         }
 
