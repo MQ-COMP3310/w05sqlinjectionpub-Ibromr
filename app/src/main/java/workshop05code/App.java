@@ -20,7 +20,7 @@ public class App {
     // Start code for logging exercise
 
 
-    static {
+    static {    // The notes below a bit confusing
         // must set before the Logger
         // loads logging.properties from the classpath
         try {// resources\logging.properties
